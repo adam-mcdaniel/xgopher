@@ -1,1 +1,1 @@
-# xmachine-go
+# xgopher

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	. "github.com/adam-mcdaniel/xmachine-go"
+	. "github.com/adam-mcdaniel/xgopher"
 )
 
 func main() {

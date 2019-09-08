@@ -1,4 +1,4 @@
-package xmachine
+package xgopher
 
 import "fmt"
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	. "xgopher"
+	. "github.com/adam-mcdaniel/xgopher"
 )
 
 func dict(m *Machine) {
@@ -124,6 +124,19 @@ func main() {
 	xasm.Push(NewFunction(rem, xasm))
 	xasm.Push(NewString("rem"))
 	xasm.Store()
+
+	xasm.Push(NewString("list"))
+	xasm.Load()
+	xasm.Call()
+	xasm.Push(NewString("println"))
+	xasm.Load()
+	xasm.Call()
+	xasm.Push(NewString("dict"))
+	xasm.Load()
+	xasm.Call()
+	xasm.Push(NewString("println"))
+	xasm.Load()
+	xasm.Call()
 
 	xasm.Push(NewFunction(func(xasm *Machine) {
 		xasm.Push(NewString("dict"))

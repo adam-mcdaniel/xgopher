@@ -121,14 +121,27 @@ func (v Value) String() string {
 	case NumberType:
 		return fmt.Sprintf("%v", v.num)
 	case ListType:
-		return fmt.Sprintf("%v", v.list)
+		result := "["
+		singleElement := true
+		for _, value := range v.list {
+			result += fmt.Sprintf("%v", value.String())
+			result += ", "
+			singleElement = false
+		}
+
+		if !singleElement {
+			result = result[:len(result)-2]
+		}
+
+		result += "]"
+		return result
 	case FunctionType:
 		return fmt.Sprintf("%v", v.fn)
 	case TreeType:
 		result := "{"
 		singleElement := true
 		for i, value := range v.tree {
-			result += fmt.Sprintf("%v: %v", i, value.String())
+			result += fmt.Sprintf("\"%v\": %v", i, value.String())
 			result += ", "
 			singleElement = false
 		}

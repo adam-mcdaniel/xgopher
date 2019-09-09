@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	. "github.com/adam-mcdaniel/xgopher"
+	. "xgopher"
 )
 
 func dict(m *Machine) {
@@ -272,7 +272,7 @@ func main() {
 	xasm.Copy()
 	xasm.Push(NewString("l"))
 	xasm.Store()
-	xasm.Push(NewNumber(1000))
+	xasm.Push(NewNumber(10))
 	xasm.Copy()
 	xasm.Push(NewString("n"))
 	xasm.Store()
@@ -301,196 +301,11 @@ func main() {
 		xasm.Load()
 	}, xasm.Duplicate()))
 	xasm.WhileLoop()
-	xasm.Push(NewNumber(100))
+	xasm.Push(NewString("l"))
+	xasm.Load()
 	xasm.Copy()
-	xasm.Push(NewString("n"))
-	xasm.Store()
-	xasm.Push(NewFunction(func(xasm *Machine) {
-		xasm.Push(NewString("n"))
-		xasm.Load()
-		xasm.Copy()
-		xasm.Push(NewNumber(100))
-		xasm.Copy()
-		xasm.Push(NewString("sub"))
-		xasm.Load()
-		xasm.Call()
-		xasm.Copy()
-		xasm.Push(NewString("l"))
-		xasm.Load()
-		xasm.Push(NewString("index"))
-		xasm.MethodCall()
-		xasm.Copy()
-		xasm.Push(NewString("println"))
-		xasm.Load()
-		xasm.Call()
-		xasm.Push(NewNumber(1))
-		xasm.Copy()
-		xasm.Push(NewString("n"))
-		xasm.Load()
-		xasm.Copy()
-		xasm.Push(NewString("sub"))
-		xasm.Load()
-		xasm.Call()
-		xasm.Copy()
-		xasm.Push(NewString("n"))
-		xasm.Store()
-	}, xasm.Duplicate()))
-	xasm.Push(NewFunction(func(xasm *Machine) {
-		xasm.Push(NewNumber(0))
-		xasm.Copy()
-		xasm.Push(NewString("n"))
-		xasm.Load()
-		xasm.Copy()
-		xasm.Push(NewString("sub"))
-		xasm.Load()
-		xasm.Call()
-	}, xasm.Duplicate()))
-	xasm.WhileLoop()
+	xasm.Push(NewString("println"))
+	xasm.Load()
+	xasm.Call()
 
-	fmt.Println(xasm)
 }
-
-// fn rem(xasm: &mut Machine) {
-//     let m = xasm.get_arg::<f64>();
-//     let n = xasm.get_arg::<f64>();
-
-//     xasm.push(
-//         Value::number(m % n)
-//     );
-// }
-
-// fn main() {
-//     let mut xasm = Machine::new();
-//     xasm.push(Value::function(dict, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("dict"));
-//     xasm.store();
-
-//     xasm.push(Value::function(list, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("list"));
-//     xasm.store();
-//     xasm.push(Value::function(len, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("len"));
-//     xasm.store();
-//     xasm.push(Value::function(push, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("push"));
-//     xasm.store();
-//     xasm.push(Value::function(pop, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("pop"));
-//     xasm.store();
-
-//     xasm.push(Value::function(print, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("print"));
-//     xasm.store();
-//     xasm.push(Value::function(println, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("println"));
-//     xasm.store();
-//     xasm.push(Value::function(new, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("new"));
-//     xasm.store();
-
-//     xasm.push(Value::function(add, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("add"));
-//     xasm.store();
-//     xasm.push(Value::function(sub, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("sub"));
-//     xasm.store();
-//     xasm.push(Value::function(mul, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("mul"));
-//     xasm.store();
-//     xasm.push(Value::function(div, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("div"));
-//     xasm.store();
-//     xasm.push(Value::function(rem, &xasm));
-//     xasm.copy();
-//     xasm.push(Value::string("rem"));
-//     xasm.store();
-//  xasm.push(Value::function(|xasm: &mut Machine| {xasm.push(Value::string("object"));
-// 	xasm.store();
-// 	xasm.push(Value::function(|xasm: &mut Machine| {xasm.push(Value::string("object"));
-// 	xasm.load();
-// 	xasm.copy();
-// 	xasm.push(Value::string("println"));
-// 	xasm.load();
-// 	xasm.call();
-// 	}, &xasm));
-// 	xasm.push(Value::function(|xasm: &mut Machine| {xasm.push(Value::string("object"));
-// 	xasm.load();
-// 	xasm.push(Value::string("to_str"));
-// 	xasm.method_call();
-// 	xasm.copy();
-// 	xasm.push(Value::string("println"));
-// 	xasm.load();
-// 	xasm.call();
-// 	}, &xasm));
-// 	xasm.push(Value::function(|xasm: &mut Machine| {xasm.push(Value::string("object"));
-// 	xasm.load();
-// 	xasm.push(Value::string("to_str"));
-// 	xasm.index();
-// 	}, &xasm));
-// 	xasm.if_then_else();
-// 	}, &xasm));
-// 	xasm.copy();
-// 	xasm.push(Value::string("print"));
-// 	xasm.store();
-// 	xasm.push(Value::string("string"));
-// 	xasm.copy();
-// 	xasm.push(Value::string("print"));
-// 	xasm.load();
-// 	xasm.call();
-// 	xasm.push(Value::function(|xasm: &mut Machine| {xasm.push(Value::string("dict"));
-// 	xasm.load();
-// 	xasm.call();
-// 	xasm.copy();
-// 	xasm.push(Value::string("self"));
-// 	xasm.store();
-// 	xasm.push(Value::function(|xasm: &mut Machine| {xasm.push(Value::string("self"));
-// 	xasm.store();
-// 	xasm.push(Value::string("self"));
-// 	xasm.load();
-// 	}, &xasm));
-// 	xasm.copy();
-// 	xasm.push(Value::string("self"));
-// 	xasm.load();
-// 	xasm.push(Value::string("new"));
-// 	xasm.index();
-// 	xasm.assign();
-// 	xasm.push(Value::function(|xasm: &mut Machine| {xasm.push(Value::string("self"));
-// 	xasm.store();
-// 	xasm.push(Value::string("TESTING!!!"));
-// 	}, &xasm));
-// 	xasm.copy();
-// 	xasm.push(Value::string("self"));
-// 	xasm.load();
-// 	xasm.push(Value::string("to_str"));
-// 	xasm.index();
-// 	xasm.assign();
-// 	xasm.push(Value::string("self"));
-// 	xasm.load();
-// 	}, &xasm));
-// 	xasm.copy();
-// 	xasm.push(Value::string("Test"));
-// 	xasm.store();
-// 	xasm.push(Value::string("Test"));
-// 	xasm.load();
-// 	xasm.copy();
-// 	xasm.push(Value::string("new"));
-// 	xasm.load();
-// 	xasm.call();
-// 	xasm.copy();
-// 	xasm.push(Value::string("print"));
-// 	xasm.load();
-// 	xasm.call();
-
-// }

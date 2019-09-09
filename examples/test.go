@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	. "xgopher"
+	. "github.com/adam-mcdaniel/xgopher"
 )
 
 func dict(m *Machine) {

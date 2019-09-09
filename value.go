@@ -125,7 +125,20 @@ func (v Value) String() string {
 	case FunctionType:
 		return fmt.Sprintf("%v", v.fn)
 	case TreeType:
-		return fmt.Sprintf("%v", v.tree)
+		result := "{"
+		singleElement := true
+		for i, value := range v.tree {
+			result += fmt.Sprintf("%v: %v", i, value.String())
+			result += ", "
+			singleElement = false
+		}
+
+		if !singleElement {
+			result = result[:len(result)-2]
+		}
+
+		result += "}"
+		return result
 	case ErrorType:
 		return fmt.Sprintf("<Exception: '%v'>", v.err)
 	default:

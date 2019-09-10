@@ -2,6 +2,7 @@ package xgopher
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 )
 
@@ -100,7 +101,7 @@ func (v Value) Bool() bool {
 	case StringType:
 		return len(v.str) > 0
 	case NumberType:
-		return v.num != 0
+		return math.Abs(v.num) > 0.0000000001
 	case ListType:
 		return len(v.list) > 0
 	case FunctionType:

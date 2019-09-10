@@ -17,6 +17,10 @@ func (m *Machine) Push(value *Value) {
 
 func (m *Machine) Pop() *Value {
 	result := NewNone()
+	if len(m.stack) == 0 {
+		m.Push(NewNone())
+	}
+
 	result, m.stack = m.stack[len(m.stack)-1], m.stack[:len(m.stack)-1]
 	return result
 }

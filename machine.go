@@ -32,7 +32,6 @@ func (m *Machine) Pop() (*Value, error) {
 	if len(m.stack) == 0 {
 		return result, MakeError("No value on stack")
 	}
-	// fmt.Println(m.stack)
 	result, m.stack = m.stack[len(m.stack)-1], m.stack[:len(m.stack)-1]
 
 	return result, nil
@@ -100,7 +99,7 @@ func (m *Machine) WhileLoop() {
 		if body, err := m.Pop(); err == nil {
 			getCondition := func(m *Machine) bool {
 				result, err := m.Pop()
-				if err != nil || result == nil {
+				if err != nil {
 					return false
 				}
 				return result.Bool()
@@ -121,7 +120,7 @@ func (m *Machine) IfThenElse() {
 			if elseFn, err := m.Pop(); err == nil {
 				getCondition := func(m *Machine) bool {
 					result, err := m.Pop()
-					if err != nil || result == nil {
+					if err != nil {
 						return false
 					}
 					return result.Bool()

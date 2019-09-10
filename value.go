@@ -108,8 +108,6 @@ func (v Value) Bool() bool {
 		return true
 	case TreeType:
 		return len(v.tree) > 0
-	case ErrorType:
-		return false
 	default:
 		return false
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 )
 
 type Type int
@@ -30,6 +31,14 @@ type Value struct {
 
 func NewNone() *Value {
 	return &Value{valueType: NoneType}
+}
+
+func NewBool(value bool) *Value {
+	if value {
+		return NewNumber(1)
+	} else {
+		return NewNumber(0)
+	}
 }
 
 func NewString(str string) *Value {
@@ -62,6 +71,10 @@ func NewTree(tree map[string]*Value) *Value {
 
 func NewError(err string) *Value {
 	return &Value{valueType: ErrorType, err: err}
+}
+
+func (v Value) Type() Type {
+	return v.valueType
 }
 
 func (v *Value) Index(index string) *Value {
@@ -210,4 +223,106 @@ func (v Value) callGlobal(machine *Machine) {
 	if v.valueType == FunctionType {
 		v.fn.call(machine)
 	}
+}
+
+func (a Value) Add(b *Value) *Value {
+	aType := a.valueType
+	bType := b.valueType
+	if aType == StringType && bType == StringType {
+		return NewString(a.str + b.str)
+	} else if aType == NumberType && bType == NumberType {
+		return NewNumber(a.num + b.num)
+	} else if aType == ListType && bType == ListType {
+		return NewList(append(a.list, b.list...))
+	}
+	return NewError(fmt.Sprintf("Could not add %v and %v", a, b))
+}
+
+func (a Value) Sub(b *Value) *Value {
+	aType := a.valueType
+	bType := b.valueType
+	if aType == NumberType && bType == NumberType {
+		return NewNumber(a.num - b.num)
+	}
+	return NewError(fmt.Sprintf("Could not subtract %v and %v", a, b))
+}
+
+func (a Value) Mul(b *Value) *Value {
+	aType := a.valueType
+	bType := b.valueType
+	if aType == NumberType && bType == NumberType {
+		return NewNumber(a.num * b.num)
+	} else if aType == StringType && bType == NumberType {
+		return NewString(strings.Repeat(a.str, int(b.num)))
+	}
+	return NewError(fmt.Sprintf("Could not multiply %v and %v", a, b))
+}
+
+func (a Value) Div(b *Value) *Value {
+	aType := a.valueType
+	bType := b.valueType
+	if aType == NumberType && bType == NumberType {
+		return NewNumber(a.num / b.num)
+	}
+	return NewError(fmt.Sprintf("Could not divide %v and %v", a, b))
+}
+
+func (a Value) Rem(b *Value) *Value {
+	aType := a.valueType
+	bType := b.valueType
+	if aType == NumberType && bType == NumberType {
+		return NewNumber(math.Mod(a.num, b.num))
+	}
+	return NewError(fmt.Sprintf("Could not find the remainder of %v and %v", a, b))
+}
+
+func (a Value) Not() *Value {
+	if a.valueType == NumberType {
+		if int(a.num) == 0 {
+			return NewNumber(1)
+		} else {
+			return NewNumber(0)
+		}
+	}
+	return NewError(fmt.Sprintf("Could not negate %v", a))
+}
+
+func (a Value) Eq(b *Value) *Value {
+	aType := a.valueType
+	bType := b.valueType
+	if aType != bType {
+		return NewBool(false)
+	}
+
+	if aType == NumberType && bType == NumberType {
+		return NewBool(a.num == b.num)
+	} else if aType == StringType && bType == StringType {
+		return NewBool(a.str == b.str)
+	} else if aType == ListType && bType == ListType {
+		for i := range a.list {
+			if !(a.list[i].Eq(b.list[i])).Bool() {
+				return NewBool(false)
+			}
+		}
+		return NewBool(true)
+	} else if aType == FunctionType && bType == FunctionType {
+		return NewBool(a.fn.getContext().eq(b.fn.getContext()))
+	} else if aType == TreeType && bType == TreeType {
+		for key, first := range a.tree {
+			if second, ok := b.tree[key]; ok {
+				if !(first.Eq(second)).Bool() {
+					return NewBool(false)
+				}
+			} else {
+				return NewBool(false)
+			}
+		}
+		return NewBool(true)
+	} else if aType == ErrorType && bType == ErrorType {
+		return NewBool(a.err == b.err)
+	} else if aType == NoneType && bType == NoneType {
+		return NewBool(true)
+	}
+
+	return NewBool(false)
 }

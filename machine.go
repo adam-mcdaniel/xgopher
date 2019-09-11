@@ -19,6 +19,29 @@ type Machine struct {
 	registers map[string]*Value
 }
 
+func (a Machine) eq(b Machine) bool {
+	for i := range a.stack {
+		if i >= len(b.stack) {
+			return false
+		}
+		if !(a.stack[i].Eq(b.stack[i])).Bool() {
+			return false
+		}
+	}
+
+	for key, first := range a.registers {
+		if second, ok := b.registers[key]; ok {
+			if !(first.Eq(second)).Bool() {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+
+	return true
+}
+
 func MakeMachine() Machine {
 	return Machine{stack: []*Value{}, registers: make(map[string]*Value)}
 }
@@ -27,39 +50,34 @@ func (m *Machine) Push(value *Value) {
 	m.stack = append(m.stack, value)
 }
 
-func (m *Machine) Pop() (*Value, error) {
-	result := NewNone()
+func (m *Machine) Pop() *Value {
+	result := NewError("Popped from empty stack, called function with too few arguments")
 	if len(m.stack) == 0 {
-		return result, MakeError("No value on stack")
+		return result
 	}
+
 	result, m.stack = m.stack[len(m.stack)-1], m.stack[:len(m.stack)-1]
 
-	return result, nil
+	return result
 }
 
 func (m *Machine) Call() {
-	if value, err := m.Pop(); err == nil {
-		value.call(m)
-	}
+	m.Pop().call(m)
 }
 
 func (m *Machine) Copy() {
-	if value, err := m.Pop(); err == nil {
-		m.Push(value.Copy())
-	}
+	m.Push(m.Pop().Copy())
 }
 
 func (m *Machine) Store() {
-	if key, err := m.Pop(); err == nil {
-		if value, err := m.Pop(); err == nil {
-			m.registers[key.String()] = value
-		}
-	}
+	key := m.Pop()
+	value := m.Pop()
+	m.registers[key.String()] = value
 }
 
 func (m *Machine) Load() {
-	key, err := m.Pop()
-	if val, ok := m.registers[key.String()]; ok && (err == nil) {
+	key := m.Pop()
+	if val, ok := m.registers[key.String()]; ok {
 		m.Push(val)
 	} else {
 		m.Push(NewError(fmt.Sprintf("No register named %v", key.String())))
@@ -67,73 +85,54 @@ func (m *Machine) Load() {
 }
 
 func (m *Machine) Assign() {
-	if reference, err := m.Pop(); err == nil {
-		if value, err := m.Pop(); err == nil {
-			*reference = *value
-		}
-	}
+	reference := m.Pop()
+	value := m.Pop()
+	*reference = *value
 }
 
 func (m *Machine) Index() {
-	if index, err := m.Pop(); err == nil {
-		if table, err := m.Pop(); err == nil {
-			m.Push(table.Index(index.String()))
-		}
-	}
+	index := m.Pop()
+	table := m.Pop()
+	m.Push(table.Index(index.String()))
 }
 
 func (m *Machine) MethodCall() {
-	if index, err := m.Pop(); err == nil {
-		if table, err := m.Pop(); err == nil {
-			m.Push(table)
-			m.Push(table)
-			m.Push(index)
-			m.Index()
-			m.Call()
-		}
-	}
+	index := m.Pop()
+	table := m.Pop()
+	m.Push(table)
+	m.Push(table)
+	m.Push(index)
+	m.Index()
+	m.Call()
 }
 
 func (m *Machine) WhileLoop() {
-	if condition, err := m.Pop(); err == nil {
-		if body, err := m.Pop(); err == nil {
-			getCondition := func(m *Machine) bool {
-				result, err := m.Pop()
-				if err != nil {
-					return false
-				}
-				return result.Bool()
-			}
+	condition := m.Pop()
+	body := m.Pop()
+	getCondition := func(m *Machine) bool {
+		return m.Pop().Bool()
+	}
 
-			condition.callGlobal(m)
-			for getCondition(m) {
-				body.callGlobal(m)
-				condition.callGlobal(m)
-			}
-		}
+	condition.callGlobal(m)
+	for getCondition(m) {
+		body.callGlobal(m)
+		condition.callGlobal(m)
 	}
 }
 
 func (m *Machine) IfThenElse() {
-	if condition, err := m.Pop(); err == nil {
-		if thenFn, err := m.Pop(); err == nil {
-			if elseFn, err := m.Pop(); err == nil {
-				getCondition := func(m *Machine) bool {
-					result, err := m.Pop()
-					if err != nil {
-						return false
-					}
-					return result.Bool()
-				}
+	condition := m.Pop()
+	thenFn := m.Pop()
+	elseFn := m.Pop()
+	getCondition := func(m *Machine) bool {
+		return m.Pop().Bool()
+	}
 
-				condition.callGlobal(m)
-				if getCondition(m) {
-					thenFn.callGlobal(m)
-				} else {
-					elseFn.callGlobal(m)
-				}
-			}
-		}
+	condition.callGlobal(m)
+	if getCondition(m) {
+		thenFn.callGlobal(m)
+	} else {
+		elseFn.callGlobal(m)
 	}
 }
 

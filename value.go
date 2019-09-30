@@ -82,7 +82,7 @@ func (v *Value) Index(index string) *Value {
 	case ListType:
 		num, err := strconv.Atoi(index)
 		if err != nil {
-			return NewNone()
+			return NewError("Can't index list with non-integer")
 		}
 
 		for num >= len(v.list) {
@@ -93,10 +93,15 @@ func (v *Value) Index(index string) *Value {
 	case StringType:
 		num, err := strconv.Atoi(index)
 		if err != nil {
-			return NewNone()
+			return NewError("Can't index string with non-integer")
 		}
 
-		return NewString(string(v.str[num]))
+		if len(v.str) > num && num >= 0 {
+			return NewString(string(v.str[num]))
+		} else {
+			return NewError("String index out of bounds")
+		}
+
 	case TreeType:
 		if val, ok := v.tree[index]; ok {
 			return val
@@ -169,6 +174,14 @@ func (v Value) String() string {
 	default:
 		return "None"
 	}
+}
+
+func (v Value) IsNone() bool {
+	return v.valueType == NoneType
+}
+
+func (v Value) Str() string {
+	return v.str
 }
 
 func (v Value) Slice() []*Value {

@@ -238,6 +238,22 @@ func (v Value) callGlobal(machine *Machine) {
 	}
 }
 
+func (v Value) IntoIter() []*Value {
+	switch v.valueType {
+	case ListType:
+		return v.Slice()
+	case StringType:
+		result := []*Value{}
+		for ch := range v.str {
+			result = append(result, NewString(string(ch)))
+		}
+		return result
+	default:
+		return []*Value{}
+	}
+}
+
+
 func (a Value) Add(b *Value) *Value {
 	aType := a.valueType
 	bType := b.valueType

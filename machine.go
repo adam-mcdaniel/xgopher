@@ -106,17 +106,27 @@ func (m *Machine) MethodCall() {
 	m.Call()
 }
 
+func (m *Machine) ForLoop() {
+	counter_name := m.Pop()
+	element_name := m.Pop()
+	iterator := m.Pop().IntoIter()
+	body := m.Pop()
+
+	for counter, element := range iterator {
+		m.registers[element_name.String()] = element
+		m.registers[counter_name.String()] = NewNumber(float64(counter))
+		body.callGlobal(m)
+	}
+}
+
 func (m *Machine) WhileLoop() {
 	condition := m.Pop()
 	body := m.Pop()
-	getCondition := func(m *Machine) bool {
-		return m.Pop().Bool()
-	}
 
-	condition.callGlobal(m)
-	for getCondition(m) {
-		body.callGlobal(m)
-		condition.callGlobal(m)
+	condition.fn.fn(m)
+	for m.Pop().Bool() {
+		body.fn.fn(m)
+		condition.fn.fn(m)
 	}
 }
 
@@ -124,26 +134,21 @@ func (m *Machine) IfThenElse() {
 	condition := m.Pop()
 	thenFn := m.Pop()
 	elseFn := m.Pop()
-	getCondition := func(m *Machine) bool {
-		return m.Pop().Bool()
-	}
 
-	condition.callGlobal(m)
-	if getCondition(m) {
-		thenFn.callGlobal(m)
+	condition.fn.fn(m)
+	if m.Pop().Bool() {
+		thenFn.fn.fn(m)
 	} else {
-		elseFn.callGlobal(m)
+		elseFn.fn.fn(m)
 	}
 }
 
 func (m Machine) Duplicate() Machine {
 	newMachine := MakeMachine()
-	for _, item := range m.stack {
-		newMachine.Push(item.Copy().Copy())
-	}
+	newMachine.stack = m.stack
 
 	for key, value := range m.registers {
-		newMachine.registers[key] = value.Copy().Copy()
+		newMachine.registers[key] = value
 	}
 
 	return newMachine

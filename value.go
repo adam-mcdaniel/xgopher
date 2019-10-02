@@ -335,7 +335,7 @@ func (a Value) Eq(b *Value) *Value {
 		}
 		return NewBool(true)
 	} else if aType == FunctionType && bType == FunctionType {
-		return NewBool(a.fn.getContext().eq(b.fn.getContext()))
+		return NewBool(a.String() == b.String())
 	} else if aType == TreeType && bType == TreeType {
 		for key, first := range a.tree {
 			if second, ok := b.tree[key]; ok {

@@ -209,7 +209,7 @@ func (v Value) Copy() *Value {
 		}
 		return NewList(newList)
 	case FunctionType:
-		return NewFunction(v.fn.fn, v.fn.context)
+		return NewFunction(v.fn.fn, v.fn.getContext())
 	case TreeType:
 		newMap := make(map[string]*Value)
 		for key, value := range v.tree {
@@ -244,7 +244,7 @@ func (v Value) IntoIter() []*Value {
 		return v.Slice()
 	case StringType:
 		result := []*Value{}
-		for ch := range v.str {
+		for _, ch := range v.str {
 			result = append(result, NewString(string(ch)))
 		}
 		return result

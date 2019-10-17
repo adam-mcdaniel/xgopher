@@ -4,11 +4,11 @@ import "fmt"
 
 type Function struct {
 	fn      func(*Machine)
-	context Machine
+	context map[string]*Value
 }
 
 func makeFunction(fn func(*Machine), context Machine) Function {
-	return Function{fn, context}
+	return Function{fn, context.registers}
 }
 
 func (fn Function) call(machine *Machine) {
@@ -16,7 +16,9 @@ func (fn Function) call(machine *Machine) {
 }
 
 func (fn Function) getContext() Machine {
-	return fn.context
+	machine := MakeMachine()
+	machine.registers = fn.context
+	return machine
 }
 
 func (fn Function) String() string {

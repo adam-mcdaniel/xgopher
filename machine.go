@@ -115,7 +115,7 @@ func (m *Machine) ForLoop() {
 	for counter, element := range iterator {
 		m.registers[element_name.String()] = element
 		m.registers[counter_name.String()] = NewNumber(float64(counter))
-		body.callGlobal(m)
+		body.fn.fn(m)
 	}
 }
 
